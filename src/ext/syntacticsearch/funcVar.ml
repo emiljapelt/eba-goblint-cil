@@ -27,9 +27,9 @@ let map_gvar f = function
 
 let is_temporary id = Inthash.mem allTempVars id
 
-let generate_func_loc_table cilfile =
-  Util.list_filter_map
-    (map_gfun (fun dec loc -> Some (dec.svar.vname, loc.line)))
+let get_func_loc cilfile fname =
+  List.find_map
+    (map_gfun (fun dec loc -> if dec.svar.vname = fname then Some loc else None))
     cilfile.globals
 
 let generate_globalvar_list cilfile =
@@ -38,26 +38,13 @@ let generate_globalvar_list cilfile =
     cilfile.globals
 
 let get_all_alphaconverted_in_fun varname funname cilfile =
-  let fun_loc_table = generate_func_loc_table cilfile in
-  let loc_start =
-    snd
-    @@ List.find (function x, _ -> String.compare x funname = 0) fun_loc_table
-  in
-  let rec iter_fun_loc list =
-    match list with
-    | (fname, _) :: xs ->
-        if fname = funname then
-          match xs with (_, line) :: _ -> line | [] -> max_int
-        else iter_fun_loc xs
-    | [] -> 0
-  in
-  let loc_end = iter_fun_loc fun_loc_table in
+  let fun_loc = Option.get (get_func_loc cilfile funname) in
+  let loc_within_fun loc = loc.file = fun_loc.file
+    && loc.line >= fun_loc.line && (loc.line < fun_loc.endLine || fun_loc.endLine < 0) in
   let tmp =
     Util.list_filter_map
       (function
-        | EnvVar varinfo, loc when loc.line >= loc_start && loc.line < loc_end
-          ->
-            Some varinfo.vname
+        | EnvVar varinfo, loc when loc_within_fun loc-> Some varinfo.vname
         | _ -> None)
       (Hashtbl.find_all environment varname)
   in
