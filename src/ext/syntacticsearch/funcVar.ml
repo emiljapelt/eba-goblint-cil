@@ -27,10 +27,13 @@ let map_gvar f = function
 
 let is_temporary id = Inthash.mem allTempVars id
 
+(* fails when there is no function with name fname in cilfile *)
 let get_func_loc cilfile fname =
-  List.find_map
-    (map_gfun (fun dec loc -> if dec.svar.vname = fname then Some loc else None))
-    cilfile.globals
+  let rec find_loc = function
+  | [] -> failwith ("no function with name " ^ fname ^ " found")
+  | GFun (fd, loc) :: l when fd.svar.vname = fname -> loc
+  | _ :: l -> find_loc l in
+  find_loc cilfile.globals
 
 let generate_globalvar_list cilfile =
   Util.list_filter_map
@@ -38,7 +41,7 @@ let generate_globalvar_list cilfile =
     cilfile.globals
 
 let get_all_alphaconverted_in_fun varname funname cilfile =
-  let fun_loc = Option.get (get_func_loc cilfile funname) in
+  let fun_loc = get_func_loc cilfile funname in
   let loc_within_fun loc = loc.file = fun_loc.file
     && loc.line >= fun_loc.line && (loc.line < fun_loc.endLine || fun_loc.endLine < 0) in
   let tmp =
