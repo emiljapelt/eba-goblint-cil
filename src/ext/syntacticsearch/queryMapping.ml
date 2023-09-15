@@ -46,6 +46,8 @@ let rec and_several_lists list_of_lists =
 
 (* Naming of functions: resolve_query_[kind]_[find]_[structure] *)
 
+exception Not_supported
+
 (* Resolution of datatype-oriented queries *)
 let resolve_query_datatype_uses_fun query cilfile funname =
   match query.tar with
@@ -60,9 +62,7 @@ let resolve_query_datatype_uses_fun query cilfile funname =
         (List.map
            (fun x -> FuncDatatype.find_uses_in_fun x funname cilfile)
            list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_datatype_uses_none query cilfile =
   match query.tar with
@@ -72,9 +72,7 @@ let resolve_query_datatype_uses_none query cilfile =
         (List.map (fun x -> FuncDatatype.find_uses x cilfile) list)
   | Or_t list ->
       List.flatten (List.map (fun x -> FuncDatatype.find_uses x cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_datatype_uses_cond query cilfile =
   match query.tar with
@@ -85,9 +83,7 @@ let resolve_query_datatype_uses_cond query cilfile =
   | Or_t list ->
       List.flatten
         (List.map (fun x -> FuncDatatype.find_uses_in_cond x cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_datatype_uses_noncond query cilfile =
   match query.tar with
@@ -98,9 +94,7 @@ let resolve_query_datatype_uses_noncond query cilfile =
   | Or_t list ->
       List.flatten
         (List.map (fun x -> FuncDatatype.find_uses_in_cond x cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_datatype_uses query cilfile =
   match query.str with
@@ -115,24 +109,18 @@ let resolve_query_datatype_defs_none query cilfile =
   | Or_t list ->
       List.flatten (List.map (fun x -> FuncDatatype.find_def x cilfile) list)
   | All_t -> FuncDatatype.find_def_all cilfile
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_datatype_defs query cilfile =
   match query.str with
   | None_s -> resolve_query_datatype_defs_none query cilfile
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_datatype query cilfile =
   match query.f with
   | Uses_f -> resolve_query_datatype_uses query cilfile
   | Defs_f -> resolve_query_datatype_defs query cilfile
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 (* Resolution of variable-oriented queries *)
 let resolve_query_var_uses_fun query cilfile funname =
@@ -216,9 +204,7 @@ let resolve_query_var_decl_fun query cilfile funname =
         (List.map
            (fun x -> FuncVar.find_decl_in_fun x (-1) funname cilfile)
            list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_var_decl_none query cilfile =
   match query.tar with
@@ -228,18 +214,14 @@ let resolve_query_var_decl_none query cilfile =
   | All_t -> FuncVar.find_decl_all cilfile
   | Or_t list ->
       List.flatten (List.map (fun x -> FuncVar.find_decl x (-1) cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_var_decl query cilfile =
   match query.str with
   | Fun_s funname -> resolve_query_var_decl_fun query cilfile funname
   | None_s -> resolve_query_var_decl_none query cilfile
   | NonCond_s -> resolve_query_var_decl_none query cilfile
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_var_defs_fun query cilfile funname =
   match query.tar with
@@ -252,9 +234,7 @@ let resolve_query_var_defs_fun query cilfile funname =
         (List.map
            (fun x -> FuncVar.find_defs_in_fun x (-1) funname cilfile)
            list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_var_defs_none query cilfile =
   match query.tar with
@@ -264,26 +244,20 @@ let resolve_query_var_defs_none query cilfile =
   | All_t -> FuncVar.find_defs_all cilfile
   | Or_t list ->
       List.flatten (List.map (fun x -> FuncVar.find_defs x (-1) cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_var_defs query cilfile =
   match query.str with
   | Fun_s funname -> resolve_query_var_defs_fun query cilfile funname
   | None_s -> resolve_query_var_defs_none query cilfile
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_var query cilfile =
   match query.f with
   | Uses_f -> resolve_query_var_uses query cilfile
   | Decl_f -> resolve_query_var_decl query cilfile
   | Defs_f -> resolve_query_var_defs query cilfile
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_return_none query cilfile =
   match query.tar with
@@ -293,16 +267,12 @@ let resolve_query_fun_return_none query cilfile =
   | Or_t list ->
       List.flatten
         (List.map (fun x -> FuncFunction.find_returns x (-1) cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_return query cilfile =
   match query.str with
   | None_s -> resolve_query_fun_return_none query cilfile
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_defs_none query cilfile =
   match query.tar with
@@ -312,16 +282,12 @@ let resolve_query_fun_defs_none query cilfile =
   | Or_t list ->
       List.flatten
         (List.map (fun x -> FuncFunction.find_def x (-1) cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_defs query cilfile =
   match query.str with
   | None_s -> resolve_query_fun_defs_none query cilfile
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_uses_none query cilfile =
   match query.tar with
@@ -334,9 +300,7 @@ let resolve_query_fun_uses_none query cilfile =
   | Or_t list ->
       List.flatten
         (List.map (fun x -> FuncFunction.find_uses x (-1) cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_uses_fun query cilfile funname =
   match query.tar with
@@ -353,9 +317,7 @@ let resolve_query_fun_uses_fun query cilfile funname =
         (List.map
            (fun x -> FuncFunction.find_uses_in_fun x (-1) funname cilfile)
            list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_uses_cond query cilfile =
   match query.tar with
@@ -368,9 +330,7 @@ let resolve_query_fun_uses_cond query cilfile =
   | Or_t list ->
       List.flatten
         (List.map (fun x -> FuncFunction.find_uses_cond x (-1) cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_uses_noncond query cilfile =
   match query.tar with
@@ -383,9 +343,7 @@ let resolve_query_fun_uses_noncond query cilfile =
   | Or_t list ->
       List.flatten
         (List.map (fun x -> FuncFunction.find_uses_noncond x (-1) cilfile) list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_uses query cilfile =
   match query.str with
@@ -415,9 +373,7 @@ let resolve_query_fun_usesvar_fun query cilfile varname strucfunname =
              FuncFunction.find_usesvar_in_fun x (-1) strucfunname varname
                cilfile)
            list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_usesvar_none query cilfile varname =
   match query.tar with
@@ -434,9 +390,7 @@ let resolve_query_fun_usesvar_none query cilfile varname =
         (List.map
            (fun x -> FuncFunction.find_usesvar x (-1) varname cilfile)
            list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_usesvar_cond query cilfile varname =
   match query.tar with
@@ -454,9 +408,7 @@ let resolve_query_fun_usesvar_cond query cilfile varname =
         (List.map
            (fun x -> FuncFunction.find_usesvar_cond x (-1) varname cilfile)
            list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_usesvar_noncond query cilfile varname =
   match query.tar with
@@ -474,9 +426,7 @@ let resolve_query_fun_usesvar_noncond query cilfile varname =
         (List.map
            (fun x -> FuncFunction.find_usesvar_noncond x (-1) varname cilfile)
            list)
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 let resolve_query_fun_usesvar query cilfile varname =
   match query.str with
@@ -492,9 +442,7 @@ let resolve_query_fun query cilfile =
   | Defs_f -> resolve_query_fun_defs query cilfile
   | Uses_f -> resolve_query_fun_uses query cilfile
   | UsesWithVar_f varname -> resolve_query_fun_usesvar query cilfile varname
-  | _ ->
-      Printf.printf "Not supported.\n";
-      [ ("", loc_default, "", -1) ]
+  | _ -> raise Not_supported
 
 (* Main mapping function *)
 let map_query query cilfile =
