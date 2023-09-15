@@ -30,9 +30,10 @@ let is_temporary id = Inthash.mem allTempVars id
 (* fails when there is no function with name fname in cilfile *)
 let get_func_loc cilfile fname =
   let rec find_loc = function
-  | [] -> failwith ("no function with name " ^ fname ^ " found")
-  | GFun (fd, loc) :: l when fd.svar.vname = fname -> loc
-  | _ :: l -> find_loc l in
+    | [] -> failwith ("no function with name " ^ fname ^ " found")
+    | GFun (fd, loc) :: l when fd.svar.vname = fname -> loc
+    | _ :: l -> find_loc l
+  in
   find_loc cilfile.globals
 
 let generate_globalvar_list cilfile =
