@@ -209,7 +209,7 @@ and block =
 and asm_details =
     { aoutputs: (string option * string * expression) list; (* optional name, constraints and expressions for outputs *)
       ainputs: (string option * string * expression) list; (* optional name, constraints and expressions for inputs *)
-      aclobbers: string list; (* clobbered registers *)
+      aclobbers: string list (* clobbered registers *)
     }
 
 and statement =

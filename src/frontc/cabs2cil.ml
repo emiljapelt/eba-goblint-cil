@@ -6902,7 +6902,7 @@ and doStatement (s : A.statement) : chunk =
 		      Util.list_map escape tmpls
 	      in
 	      (tmpls', [], [], [])
-	  | Some { aoutputs = outs; ainputs = ins; aclobbers = clobs; } ->
+	  | Some { aoutputs = outs; ainputs = ins; aclobbers = clobs } ->
               let outs' =
 		Util.list_map
 		  (fun (id, c, e) ->

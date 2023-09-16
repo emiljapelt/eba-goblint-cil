@@ -1655,7 +1655,7 @@ asmoutputs:
   /* empty */           { None }
 | COLON asmoperands asminputs
                         { let (ins, clobs) = $3 in
-                          Some {aoutputs = $2; ainputs = ins; aclobbers = clobs;} }
+                          Some {aoutputs = $2; ainputs = ins; aclobbers = clobs} }
 ;
 asmoperands:
      /* empty */                        { [] }
