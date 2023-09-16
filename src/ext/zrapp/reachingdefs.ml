@@ -284,7 +284,7 @@ let getDefRhs didstmh stmdat defId =
 	| Call(lvo,e,el,_,_) ->
 	    (IH.add rhsHtbl defId (Some(RDCall(i),stm.sid,iosh_in));
 	     Some(RDCall(i), stm.sid, iosh_in))
-	| Asm(a,sl,slvl,sel,sl',_,_) -> None
+	| Asm(a,sl,slvl,sel,sl',_) -> None
   | VarDecl _ -> None
   ) (* ? *)
 	with Not_found ->
